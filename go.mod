@@ -6,6 +6,9 @@ require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/labstack/echo v3.3.10+incompatible
 	github.com/labstack/gommon v0.3.0 // indirect
+	github.com/vorticist/logger v0.0.0-00010101000000-000000000000
 	golang.org/x/crypto v0.0.0-20191002192127-34f69633bfdc // indirect
 	gopkg.in/mgo.v2 v2.0.0-20190816093944-a6b53ec6cb22
 )
+
+replace github.com/vorticist/logger => ../logger
