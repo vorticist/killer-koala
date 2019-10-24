@@ -83,10 +83,12 @@ func (a *App) Serve() {
 
 	mapRoutes(r, a.securedRoutes)
 
-	t := &routing.Template{
-		Templates: template.Must(template.ParseFiles(a.appViews...)),
+	if len(a.appViews) > 0 {
+		t := &routing.Template{
+			Templates: template.Must(template.ParseFiles(a.appViews...)),
+		}
+		e.Renderer = t
 	}
-	e.Renderer = t
 
 	e.Static("/static", "static")
 	e.Logger.Fatal(e.Start(":" + a.Config.Port))
