@@ -2,15 +2,6 @@ package main
 
 import (
 	"os"
-
-	"github.com/vorticist/killer-koala/routing"
-)
-
-var (
-	nonSecuredRoutes = routing.Routes{}
-	securedRoutes    = routing.Routes{}
-	appRoutes        = routing.Routes{}
-	appViews         = []string{}
 )
 
 func main() {

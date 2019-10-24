@@ -48,6 +48,18 @@ func NewAppWithConfig(config *AppConfig) App {
 	return app
 }
 
+func (a *App) AddSecuredRoute(routes routing.Routes) {
+	a.securedRoutes = append(a.securedRoutes, routes...)
+}
+
+func (a *App) AddNotSecuredRoute(routes routing.Routes) {
+	a.securedRoutes = append(a.nonSecuredRoutes, routes...)
+}
+
+func (a *App) AddViews(views []string) {
+	a.appViews = append(a.appViews, views...)
+}
+
 func (a *App) Serve() {
 	defer a.session.Close()
 	if a.Config == nil {
