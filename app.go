@@ -1,4 +1,4 @@
-package main
+package koala
 
 import (
 	"html/template"
