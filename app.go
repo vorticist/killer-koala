@@ -48,16 +48,14 @@ func NewAppWithConfig(config *AppConfig) App {
 	return app
 }
 
-func (a *App) AddSecuredRoute(routes routing.Routes) {
-	a.securedRoutes = append(a.securedRoutes, routes...)
+func (a *App) AddHandler(handler routing.Handler) {
+	a.securedRoutes = append(a.securedRoutes, handler.SecuredRoutes()...)
+	a.nonSecuredRoutes = append(a.nonSecuredRoutes, handler.Routes()...)
 }
 
-func (a *App) AddNotSecuredRoute(routes routing.Routes) {
-	a.securedRoutes = append(a.nonSecuredRoutes, routes...)
-}
-
-func (a *App) AddViews(views []string) {
-	a.appViews = append(a.appViews, views...)
+func (a *App) AddViewHandler(viewHandler routing.ViewHandler) {
+	a.AddHandler(viewHandler)
+	a.appViews = append(a.appViews, viewHandler.Views()...)
 }
 
 func (a *App) Serve() {
