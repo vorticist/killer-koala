@@ -58,6 +58,10 @@ func (a *App) AddViewHandler(viewHandler routing.ViewHandler) {
 	a.appViews = append(a.appViews, viewHandler.Views()...)
 }
 
+func (a *App) Database() *mgo.Database {
+	return a.db
+}
+
 func (a *App) Serve() {
 	defer a.session.Close()
 	if a.Config == nil {
