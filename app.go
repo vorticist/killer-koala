@@ -11,7 +11,6 @@ import (
 	"github.com/vorticist/logger"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	mgo "gopkg.in/mgo.v2"
 )
 
 type App struct {
@@ -19,9 +18,8 @@ type App struct {
 	nonSecuredRoutes routing.Routes
 	securedRoutes    routing.Routes
 	appViews         []string
-	session          *mgo.Session
 	client           *mongo.Client
-	db               *mgo.Database
+	db               *mongo.Database
 }
 
 type AppConfig struct {
@@ -61,11 +59,13 @@ func (a *App) AddViewHandler(viewHandler routing.ViewHandler) {
 }
 
 func (a *App) Database() *mongo.Database {
-	return a.client.Database(a.Config.MongoDBName)
+	if a.db == nil {
+		a.db = a.client.Database(a.Config.MongoDBName)
+	}
+	return a.db
 }
 
 func (a *App) Serve() {
-	defer a.session.Close()
 	if a.Config == nil {
 		logger.Error("not valid config values")
 		return
