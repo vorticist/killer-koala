@@ -1,6 +1,7 @@
 package koala
 
 import (
+	"context"
 	"html/template"
 
 	"github.com/labstack/echo"
@@ -8,6 +9,8 @@ import (
 	"github.com/vorticist/killer-koala/auth"
 	"github.com/vorticist/killer-koala/routing"
 	"github.com/vorticist/logger"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	mgo "gopkg.in/mgo.v2"
 )
 
@@ -17,6 +20,7 @@ type App struct {
 	securedRoutes    routing.Routes
 	appViews         []string
 	session          *mgo.Session
+	client           *mongo.Client
 	db               *mgo.Database
 }
 
@@ -38,13 +42,11 @@ type Router interface {
 func NewAppWithConfig(config *AppConfig) App {
 	var err error
 	app := App{Config: config}
-	app.session, err = mgo.Dial(app.Config.MongoDBUrl)
+	clientOptions := options.Client().ApplyURI(app.Config.MongoDBUrl)
+	app.client, err = mongo.Connect(context.TODO(), clientOptions)
 	if err != nil {
 		panic(err)
 	}
-	app.session.SetMode(mgo.Monotonic, true)
-
-	app.db = app.session.DB(app.Config.MongoDBName)
 	return app
 }
 
@@ -58,8 +60,8 @@ func (a *App) AddViewHandler(viewHandler routing.ViewHandler) {
 	a.appViews = append(a.appViews, viewHandler.Views()...)
 }
 
-func (a *App) Database() *mgo.Database {
-	return a.db
+func (a *App) Database() *mongo.Database {
+	return a.client.Database(a.Config.MongoDBName)
 }
 
 func (a *App) Serve() {
