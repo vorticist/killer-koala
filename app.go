@@ -40,10 +40,12 @@ type Router interface {
 func NewAppWithConfig(config *AppConfig) App {
 	var err error
 	app := App{Config: config}
-	clientOptions := options.Client().ApplyURI(app.Config.MongoDBUrl)
-	app.client, err = mongo.Connect(context.TODO(), clientOptions)
-	if err != nil {
-		panic(err)
+	if len(config.MongoDBUrl) > 0 && len(config.MongoDBName) > 0 {
+		clientOptions := options.Client().ApplyURI(app.Config.MongoDBUrl)
+		app.client, err = mongo.Connect(context.TODO(), clientOptions)
+		if err != nil {
+			panic(err)
+		}
 	}
 	return app
 }
