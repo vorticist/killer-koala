@@ -20,6 +20,7 @@ type App struct {
 	appViews         []string
 	client           *mongo.Client
 	db               *mongo.Database
+	middlewares      []echo.MiddlewareFunc
 }
 
 type AppConfig struct {
@@ -40,7 +41,8 @@ type Router interface {
 func NewAppWithConfig(config *AppConfig) App {
 	var err error
 	app := App{Config: config}
-	if len(config.MongoDBUrl) > 0 && len(config.MongoDBName) > 0 {
+
+	if len(app.Config.MongoDBUrl) > 0 && len(config.MongoDBName) > 0 {
 		clientOptions := options.Client().ApplyURI(app.Config.MongoDBUrl)
 		app.client, err = mongo.Connect(context.TODO(), clientOptions)
 		if err != nil {
@@ -67,6 +69,10 @@ func (a *App) Database() *mongo.Database {
 	return a.db
 }
 
+func (a *App) AddMiddleware(mf echo.MiddlewareFunc) {
+	a.middlewares = append(a.middlewares, mf)
+}
+
 func (a *App) Serve() {
 	if a.Config == nil {
 		logger.Error("not valid config values")
@@ -77,6 +83,7 @@ func (a *App) Serve() {
 	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
 		Format: "method=${method}, uri=${uri}, status=${status}, ${error} \t| ${latency_human}\n", //"${time_rfc3339} ${id} ${short_file} ${line}",
 	}))
+	e.Use(a.middlewares...)
 	e.Use(middleware.Recover())
 
 	mapRoutes(e, a.nonSecuredRoutes)
