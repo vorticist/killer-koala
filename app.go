@@ -110,7 +110,7 @@ func (a *App) Serve() {
 
 func mapRoutes(e Router, r routing.Routes) {
 	for _, route := range r {
-		switch route.Method {
+		switch route.HTTPVerb {
 		case routing.GET:
 			e.GET(route.Pattern, route.HandleFunc)
 			break

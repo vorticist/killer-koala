@@ -16,7 +16,7 @@ const (
 
 type Route struct {
 	Name       string
-	Method     string
+	HTTPVerb   string
 	Pattern    string
 	HandleFunc func(echo.Context) error
 }
