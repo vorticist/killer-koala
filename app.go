@@ -18,6 +18,7 @@ type App struct {
 	nonSecuredRoutes routing.Routes
 	securedRoutes    routing.Routes
 	appViews         []string
+	staticFolders    map[string]string
 	client           *mongo.Client
 	db               *mongo.Database
 	middlewares      []echo.MiddlewareFunc
@@ -41,6 +42,7 @@ type Router interface {
 func NewAppWithConfig(config *AppConfig) App {
 	var err error
 	app := App{Config: config}
+	app.staticFolders = make(map[string]string)
 
 	if len(app.Config.MongoDBUrl) > 0 && len(config.MongoDBName) > 0 {
 		clientOptions := options.Client().ApplyURI(app.Config.MongoDBUrl)
@@ -60,6 +62,10 @@ func (a *App) AddHandler(handler routing.Handler) {
 func (a *App) AddViewHandler(viewHandler routing.ViewHandler) {
 	a.AddHandler(viewHandler)
 	a.appViews = append(a.appViews, viewHandler.Views()...)
+}
+
+func (a *App) AddStaticFolder(prefix, folderName string) {
+	a.staticFolders[folderName] = prefix
 }
 
 func (a *App) Database() *mongo.Database {
@@ -106,6 +112,10 @@ func (a *App) Serve() {
 	}
 
 	e.Static("/static", "static")
+	for folder, prefix := range a.staticFolders {
+		logger.Infof("adding static folder: %q", folder)
+		e.Static(prefix, folder)
+	}
 	e.Logger.Fatal(e.Start(":" + a.Config.Port))
 }
 
